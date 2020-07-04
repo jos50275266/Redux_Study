@@ -128,13 +128,411 @@ function reducer(store, action) {
 
 여기서 포스기의 역할이 바로 `Redux`에서 `Dispatch `방식을 이용하는 이유라고 이해했다.
 
+# Redux App
+
+#### Steps
+
+- Design the store
+- Define the actions
+- Create a reducer
+- Set up the store
+
+```javascript
+npm i redux
+```
+
+# Designing the Store
+
+Redux App에서 첫번째로 해야하는 것은 store를 설계하는 것이다. 우리는 store에 무엇을 저장하고 혹은 유지시키고 싶은지 결정해야한다. 이번 Bug Tracking Application 프로젝트에서 state에 저장해야할 것은
+
+```javascript
+[
+    {
+        id: 1,
+        description: "",
+        resolved: false
+    },
+    { ... },
+    { ... }
+]
+
+
+// 위와 같이 Array를 사용한 구조 대신에, 아래와 같이 Object 구조를 사용할 수 있다. 이 Object는 bugs라는 프로퍼티를 가지고  또한 currentUesr 프로퍼티를 가질 수 있다. 현재 state에는 두 가지의 slice가 존재한다고 말할 수 있다.
+// 첫번째 slice = bugs
+// 두번째 slice = currentUser
+// 두 개의 slice가 있다는 말은 각 slice에 대한 두 개의 reducer가 필요하다. 
+// ---------------------------------------
+{
+    bugs: [
+	{
+        id: 1,
+        description: "",
+        resolved: false
+    	}
+    ],
+    currentUser: {}      
+}
+```
+
+# Defining the Actions
+
+![image-20200704234511800](C:\Users\user\AppData\Roaming\Typora\typora-user-images\image-20200704234511800.png)
+
+```javascript
+{
+	type: "ADD_BUG",
+	description: "..."
+}
+
+// -----------------------------
+
+{
+    type: "bugAdded",
+    payload: {
+        description: "..."
+    }
+}
+
+// .......................
+{
+    type: "bugRemoved",
+    payload: {
+        id: 1
+    }
+}
+```
+
+# Creating a Reducer
+
+```javascript
+// []
+let lastId = 0;
+
+// If statement Usage Version
+// This Reducer is a pure function
+// 몇번을 호출하던 동일한 결과값을 리턴
+function reducer(state = [], action) {
+  if (action.type === "bugAdded") {
+    return [
+      ...state,
+      {
+        id: ++lastId,
+        description: action.payload.description,
+        resolved: false,
+      },
+    ];
+  } else if (action.type === "bugRemoved") {
+    return state.filter((bug) => bug.id !== action.payload.id);
+  }
+
+  return state;
+}
+
+// Switch Cases Usage Version
+function reducer(state = [], action) {
+  switch (action.type) {
+    case "bugAdded":
+      return [
+        ...state,
+        {
+          id: ++lastId,
+          description: action.payload.description,
+          resolved: false,
+        },
+      ];
+    case "bugRemoved":
+      return state.filter((bug) => bug.id !== action.payload.id);
+    default:
+      return state;
+  }
+}
+
+```
+
+# Creating the Store
+
+```javascript
+import { createStore } from "redux";
+import reducer from "./reducer";
+
+// createStore is another higher order functon
+const store = createStore(reducer)
+
+export default store;
+```
+
+# Dispatching Actions
+
+```javascript
+import store from "./store";
+
+console.log(store);
+/*
+dispatch: 
+subscribe: get notify everytime state is changed
+getState: 
+- we only have get state, not set state
+- to change the state of store we have to dispatch an action
+- in order to send every action in same start point
+replaceReducer
+Symbol(observable)
+*/
+
+// Get Current State
+console.log(store.getState());
+
+// Let's pass an action
+store.dispatch({
+  type: "bugAdded",
+  payload: {
+    description: "Bug1",
+  },
+});
+
+console.log(store.getState());
+
+store.dispatch({
+  type: "bugRemoved",
+  payload: {
+    id: 1,
+  },
+});
+
+console.log(store.getState());
+
+```
+
+# Subscribing to the Store
+
+```javascript
+import store from "./store";
+
+store.subscribe(() => {
+  // state가 변경될 때마다 로깅해주는 기능 subscribe
+  // 이 부분에서  react 등 re-rendering을 하면 된다
+  console.log("Store changed!", store.getState());
+});
+
+// Let's pass an action
+store.dispatch({
+  type: "bugAdded",
+  payload: {
+    description: "Bug1",
+  },
+});
+
+console.log(store.getState());
+
+store.dispatch({
+  type: "bugRemoved",
+  payload: {
+    id: 1,
+  },
+});
+
+console.log(store.getState());
+
+```
+
+### Unsubscribe
+
+```javascript
+import store from "./store";
+
+// 이미 추적된 state의 경우 unscribe를 해준다 그 이유는 메모리 누수 때문이다
+// state에 update가 발생할 때 마다 새로운 메모리에 state를 생성하기 때문이다.
+const unsubscribe = store.subscribe(() => {
+  // state가 변경될 때마다 로깅해주는 기능 subscribe
+  // 이 부분에서  react 등 re-rendering을 하면 된다
+  console.log("Store changed!", store.getState());
+});
+
+// Let's pass an action
+store.dispatch({
+  type: "bugAdded",
+  payload: {
+    description: "Bug1",
+  },
+});
+
+unsubscribe();
+
+store.dispatch({
+  type: "bugRemoved",
+  payload: {
+    id: 1,
+  },
+});
+
+// 이전에 unscribe를 했기 때문에 이 시점에는 로깅을 하지않는다 (not notified)
+
+console.log(store.getState());
+
+```
+
+# Action Types
+
+```javascript
+import store from "./store";
+
+store.dispatch({
+  type: "bugAdded",
+  payload: {
+    description: "Bug1",
+  },
+});
+
+console.log(store.getState());
+
+```
+
+- 만약 내일 `bugAdded`라는 값을 `bugCreated` 로 변경 하고 싶다고 생각해보자. 그렇게되면 store과 reducer모두 변경해야한다. 하지만 아래와 같이 `actionType.js`를 정의하면 유연하고 유지성 좋은 코드를 짤 수 있다.
+
+```javascript
+// dataTypes.js
+export const BUG_ADDED = "bugAdded";
+export const BUG_REMOVED = "bugRemoved";
 
 
 
+// reducer.js
+// import { BUG_ADDED, BUG_REMOVED } from "./actionTypes"; or
+import * as actions from "./actionTypes";
+// []
+let lastId = 0;
+
+// Switch Cases Usage Version
+export default function reducer(state = [], action) {
+  switch (actions.BUG_ADDED) {
+    case "bugAdded":
+      return [
+        ...state,
+        {
+          id: ++lastId,
+          description: action.payload.description,
+          resolved: false,
+        },
+      ];
+    case actions.BUG_REMOVED:
+      return state.filter((bug) => bug.id !== action.payload.id);
+    default:
+      return state;
+  }
+}	
+
+
+// index.js
+import store from "./store";
+
+store.dispatch({
+  type: "bugAdded",
+  payload: {
+    description: "Bug1",
+  },
+});
+
+console.log(store.getState());
+
+```
+
+하지만 아직까지 `action`을 `dispatch `하는 과정에 문제가 있다. 만약 이 `action`을 여러 곳에서 사용하면 `dispatch`의 인자 값으로 들어간 `state object`를 여러번 작성해야한다. 이 과정을 개선해보자.
+
+### Action Creators
+
+```javascript
+// actions.js
+import * as actions from "./actionTypes";
+
+// export function bugAdded(description) {
+//   return {
+//     type: actions.BUG_ADDED,
+//     payload: {
+//       description,
+//     },
+//   };
+// }
+
+export const bugAdded = (description) => ({
+  type: actions.BUG_ADDED,
+  payload: {
+    description,
+  },
+});
+
+// index.js
+import store from "./store";
+import { bugAdded } from "./actions";
+
+store.dispatch(bugAdded("Bug1"));
+
+console.log(store.getState());
+
+```
+
+### Exercise
+
+- Implement resolving a bug.
+
+1. Actions
+2. Reducers
+
+```javascript
+// 1. actionsTypes.js 
+// BUG_RESOLVED 추가
+export const BUG_RESOLVED = "bugResolved";
+
+// 2. actions.js
+export const bugResolved = id => ({
+    type: actions.BUG_RESOLVED,
+    payload: {
+        id
+    }
+});
+
+// 3. reducer.js
+import * as actions from "./actionTypes";
+
+let lastId = 0;
+
+export default function reducer(state = [], action) {
+  switch (actions.BUG_ADDED) {
+    case "bugAdded":
+      return [
+        ...state,
+        {
+          id: ++lastId,
+          description: action.payload.description,
+          resolved: false,
+        },
+      ];
+          
+    case actions.BUG_REMOVED:
+      return state.filter((bug) => bug.id !== action.payload.id);
+	
+    case actions.BUG_RESOLVED:
+      return state.map(bug => bug.id !== action.payload.id ? bug : {...bug, resolved: true})    
+          
+    default:
+      return state;
+  }
+}
+
+
+// index.js
+import store from "./store";
+import { bugAdded, bugResolved } from "./actions";
+
+store.dispatch(bugAdded("Bug1"));
+
+console.log(store.getState());
+
+store.dispatch(bugResolved(1));
+
+console.log(store.getState());
 
 
 
-
+```
 
 
 
