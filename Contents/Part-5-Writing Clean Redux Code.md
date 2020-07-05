@@ -371,6 +371,52 @@ store.dispatch(actions.bugResolved({ id: 1 }));
 
 내부적으로 `creation action + create reducer` 방식으로 동작한다 생각할 수 있다.
 
+# Practice
+
+```javascript
+projects/projectAdded - [ { id: 1, name: "Project 1"}]
+```
+
+# Solution
+
+```javascript
+// /store/projects.js
+import { createSlice } from "@reduxjs/toolkit";
+
+let lastId = 0;
+const slice = createSlice({
+    name: "projects",
+    initialState: [],
+    reducers: {
+        projectAdded: (projects, action) => {
+            projects.push({
+                id: ++lastId,
+                name: action.payload.name
+            })
+        }
+    }
+})
+
+export default slice.reducer;
+export const { projectAdded } = slice.actions; 
+
+// /store/configureStore.js
+import { configureStore } from "@reduxjs/toolkit";
+import reducer from "./projects";
+
+export default function() {
+    return configureStore({ reducer });
+}
+
+// index.js
+import configureStore from "./store/configureStore";
+import { projectAdded } from "./store/projects";
+
+const store = configureStore();
+
+store.dispatch(projectAdded({ name: "Project 1"}));
+```
+
 
 
 
