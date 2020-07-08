@@ -426,6 +426,5 @@ export const getBugsByUser = (userId) =>
 export const { bugAdded, bugResolved, bugAssignedToUser } = slice.action;
 export default slice.reducer;
 
-
 ```
 
