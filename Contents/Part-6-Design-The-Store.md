@@ -386,5 +386,46 @@ export const getUnresolvedBugs = createSelector(
 Add the ability to
 - assign a bug to a team member
 - get the list of bugs assigned to a team member
+
+Steps
+- Create a slice for users. { id, name }
+- Create an action for adding a user.
+- Create an action for assigning a bug to a user.
+- Create a selector for getting bugs by a user.
+
+// users.js
+import { createSlice } from "@reduxjs/toolkit";
+
+let lastId = 0;
+
+const slice = createSlice({
+    name: "users",
+    initialState: [],
+    reducers: {
+        userAdded: (users, action) => {
+            users.push({
+                id: ++lastId,
+                name: action.payload.name
+            })
+        }
+    }
+})
+
+export const { userAdded } = slice.actions;
+export default slice.reducer;
+
+
+// bugs.js
+...
+export const getBugsByUser = (userId) => 
+	createSelector(
+    	(state) => state.entities.bugs,
+        (bugs) => bugs.filter((bug) => bug.userId === userId)
+    );
+
+export const { bugAdded, bugResolved, bugAssignedToUser } = slice.action;
+export default slice.reducer;
+
+
 ```
 
