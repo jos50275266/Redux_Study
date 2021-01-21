@@ -16,13 +16,17 @@ store.subscribe(() => {
 });
 
 store.dispatch(userAdded({ name: 'user 1' }));
-store.dispatch(userAdded({ name: 'user 2' }));
-store.dispatch(projectAdded({ name: 'Project 1' }));
-store.dispatch(bugAdded({ description: 'Bug 1' }));
-store.dispatch(bugAdded({ description: 'Bug 2' }));
-store.dispatch(bugAdded({ description: 'Bug 3' }));
-store.dispatch(bugAssignedToUser({ bugId: 1, userId: 1 }));
-store.dispatch(bugResolved({ id: 1 }));
+store.dispatch({
+  type: 'error',
+  payload: { message: 'An error occurred...' },
+});
+// store.dispatch(userAdded({ name: 'user 2' }));
+// store.dispatch(projectAdded({ name: 'Project 1' }));
+// store.dispatch(bugAdded({ description: 'Bug 1' }));
+// store.dispatch(bugAdded({ description: 'Bug 2' }));
+// store.dispatch(bugAdded({ description: 'Bug 3' }));
+// store.dispatch(bugAssignedToUser({ bugId: 1, userId: 1 }));
+// store.dispatch(bugResolved({ id: 1 }));
 
 // 매번 새로운 Array를 리턴한다 는 문제가 있다.
 // const unresolvedBugs = getUnresolvedBugs(store.getState());
@@ -34,12 +38,12 @@ const y = getUnresolvedBugs(store.getState());
 // state에 변화가 없음에도 getUnresolvedBugs와 같은 Expensive Operation을 사용하는 것은 비효율적이다.
 
 // Memoization을 이용했을시 true를 리턴한다
-console.log(x == y);
-console.log(x);
-console.log(y);
+// console.log(x == y);
+// console.log(x);
+// console.log(y);
 
-const bugs = getBugsByUser(1)(store.getState());
-console.log(bugs);
+// const bugs = getBugsByUser(1)(store.getState());
+// console.log(bugs);
 
 // Memoization - Optimizing An Expensive Function
 // f(x) => y   { input: 1, output: 2 }
