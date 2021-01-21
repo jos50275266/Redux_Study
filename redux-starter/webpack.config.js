@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/combineIndex.js',
+  entry: './src/consumingIndex.js',
   output: {
     filename: 'app.js',
     path: path.resolve(__dirname, 'dist'),

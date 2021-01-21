@@ -3,6 +3,7 @@ import logger from './middleware/logger.js';
 import reducer from './reducer.js';
 import func from './middleware/func.js';
 import toast from './middleware/toast.js';
+import api from './middleware/api';
 
 // redux/toolkit에서 func (thunk)의 기능을 제공한다 이것을 사용해보자
 // export default function () {
@@ -22,6 +23,7 @@ export default function () {
       ...getDefaultMiddleware(),
       logger({ destination: 'Console' }),
       toast,
+      api,
     ],
   });
 }
