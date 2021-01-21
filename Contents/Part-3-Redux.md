@@ -2,7 +2,7 @@
 
 Part-1에서 언급했듯이 Redux는 우리의 application의 state를 A single JavaScript object인 Central Repository에 저장한다. 
 
-![image-20200704143026815](C:\Users\user\AppData\Roaming\Typora\typora-user-images\image-20200704143026815.png)
+<img src="https://cdn-images-1.medium.com/max/1200/1*-2WiEDynB8y519odBXvs2g.png" />
 
 예를 들면, e-commerce app에서 이 Redux를 사용하면 카테고리, 쇼핑 카트, 현재 접속하고 있는 유저 정보와 같은 프로퍼티를 이 Central Repository에 저장할 수 있습니다. 하지만 Redux는 저장한 정보가 카테고리, 쇼핑 카트, 유저 정보 등인지 알지 못한다. 
 

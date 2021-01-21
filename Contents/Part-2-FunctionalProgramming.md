@@ -6,13 +6,9 @@
 
 # What is Functional Programming?
 
-![image-20200704000336727](C:\Users\user\AppData\Roaming\Typora\typora-user-images\image-20200704000336727.png)
+<img src="blob:https://medium.com/b3b34857-aa5f-41b4-8ba9-25f5a76c5fa9" />
 
 In a nutshell, functional programming is about decomposing a problem into a bunch of small and reusable functions that take some input and return a result. They don't mutate or change data.
-
-![image-20200704000542738](C:\Users\user\AppData\Roaming\Typora\typora-user-images\image-20200704000542738.png)
-
-![image-20200704000555060](C:\Users\user\AppData\Roaming\Typora\typora-user-images\image-20200704000555060.png)
 
 #### We can compose these functions to build more complex function. What are the benefits?
 
