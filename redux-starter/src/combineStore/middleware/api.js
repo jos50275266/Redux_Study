@@ -24,6 +24,7 @@ const api = ({ dispatch }) => (next) => async (action) => {
     dispatch(actions.apiCallSuccess(response.data));
 
     console.log('onSuccess', onSuccess);
+    console.log('payload', response.data);
     // Specific Success
     if (onSuccess) dispatch({ type: onSuccess, payload: response.data });
   } catch (error) {
