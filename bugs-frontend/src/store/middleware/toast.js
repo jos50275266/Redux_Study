@@ -1,6 +1,13 @@
-const toast = store => next => action => {
-  if (action.type === "error") console.log("Toastify", action.payload.message);
-  else return next(action);
-};
+// type: "error",
+// paylaod: { message: "An Error Occurred"}
 
-export default toast;
+const toast = (store) => (next) => (action) => {
+    if (action.type === 'error') {
+      console.log(`Toastify: ${action.payload.message}`);
+    } else {
+      return next(action);
+    }
+  };
+  
+  export default toast;
+  

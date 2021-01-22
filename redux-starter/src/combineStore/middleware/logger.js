@@ -7,7 +7,9 @@ const logger = (param) => (store) => (next) => (action) => {
   //   console.log('store', store);
   //   console.log('next', next);
   //   console.log('action', action);
-  next(action);
+  return next(action);
+
+  // logger > toast > api
 };
 
 // const logger = ({ getState, dispatch }) => (next) => (action) => {

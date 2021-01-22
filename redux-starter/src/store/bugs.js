@@ -1,6 +1,7 @@
 import { createAction, createReducer, createSlice } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 import { apiCallBegan } from "../combineStore/api";
+import axios from "axios";
 import moment from 'moment';
 
 const slice = createSlice({
@@ -44,7 +45,8 @@ const slice = createSlice({
   }
 });
 
-const {
+// test 목적으로 잠시 export 붙이기
+export const {
   bugAdded,
   bugResolved,
   bugAssignedToUser,
@@ -73,6 +75,29 @@ export const loadBugs = () => (dispatch, getState) => {
     onError: bugRequestFailed.type
   }));
 }
+
+// It works
+// export const addBug = bug => async dispatch => {
+//   const response = await axios.request({
+//     baseURL: 'http://localhost:9001/api',
+//     url: '/bugs',
+//     method: 'post',
+//     data: bug
+//   });
+
+//   dispatch(bugAdded(response.data));
+// }
+
+// make an api call
+// promise resolved => dispatch(success)
+// export const addBug = async bug => {
+//   try {
+//     const response = axios.post(url, bug);
+//     dispatch(bugAdded(bug));
+//   } catch (error) {
+//     dispatch({ type: 'error'});
+//   }
+// }
 
 export const addBug = bug => apiCallBegan({
   url,
