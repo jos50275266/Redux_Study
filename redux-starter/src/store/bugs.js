@@ -1,5 +1,7 @@
 import { createAction, createReducer, createSlice } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
+import { apiCallBegan } from "../combineStore/api";
+import moment from 'moment';
 
 // const bugAdded = createAction('bugAdded');
 // const bugResolved = createAction('bugResolved');
@@ -78,41 +80,132 @@ import { createSelector } from 'reselect';
 // }
 
 // reducer
-let lastId = 0;
+// let lastId = 0;
 
 // this slice will automatically create an action and reducer for us
 // 자동으로 action, reducer를 mapping 해주기 때문에 [bugAdded.type]의 방식을 사용하지 않아도 된다.
 const slice = createSlice({
   name: 'bugs',
-  initialState: [],
+
+  initialState: {
+    list: [],
+    loading: false,
+    lastFetch: null
+  },
+
   reducers: {
-    // actions => action handlers
-    // action과 action handlers를 mapping 해주는 역할을 한다
-    bugAdded: (bugs, action) => {
-      bugs.push({
-        id: ++lastId,
-        description: action.payload.description,
-        resolved: false,
-      });
+    bugRequested: (bugs, action) => {
+      bugs.loading = true;
     },
 
+    // bugs/bugReceived
+    bugReceived: (bugs, action) => {
+      bugs.list = action.payload;
+      bugs.loading = false;
+      bugs.lastFetch = Date.now();
+    },
+
+    bugRequestFailed: (bugs, action) => {
+      bugs.loading = false;
+    },
+
+    // actions => action handlers
+    // action과 action handlers를 mapping 해주는 역할을 한다
+    // command - event
+    // addBug - bugAdded
+    bugAdded: (bugs, action) => {
+      bugs.list.push(action.payload);
+    },
+
+    // resolveBug bugResolved (event)
     bugResolved: (bugs, action) => {
-      const index = bugs.findIndex((bug) => bug.id === action.payload.id);
-      bugs[index].resolved = true;
+      const index = bugs.list.findIndex((bug) => bug.id === action.payload.id);
+      bugs.list[index].resolved = true;
     },
 
     bugAssignedToUser: (bugs, action) => {
-      const { bugId, userId } = action.payload;
-      const index = bugs.findIndex((bug) => bug.id === bugId);
-      bugs[index].userId = userId;
+      const { id: bugId, userId } = action.payload;
+      const index = bugs.list.findIndex((bug) => bug.id === bugId);
+      bugs.list[index].userId = userId;
     },
   },
 });
 
 console.log(slice);
 
-export const { bugAdded, bugResolved, bugAssignedToUser } = slice.actions;
+// This is an implementation detail
+// export const { 
+//   bugAdded, // addBug
+//   bugResolved, 
+//   bugAssignedToUser, 
+//   bugReceived, 
+//   bugRequested, 
+//   bugRequestFailed
+// } = slice.actions;
+
+// 오직 addBug or resolveBug 등의 메소도로만 접근할 수 있게 만들어야한다.
+// Reducing Coupling
+const { 
+  bugAdded, // addBug
+  bugResolved, 
+  bugAssignedToUser, 
+  bugReceived, 
+  bugRequested, 
+  bugRequestFailed
+} = slice.actions;
+
 export default slice.reducer;
+
+// Action Creators - UI Layer - This is too defailed to write down on UI Layer - Use Encapsulation
+const url = "/bugs";
+
+// () => fn(dispatch, getState)
+export const loadBugs = () => (dispatch, getState) => {
+  const { lastFetch } = getState().entities.bugs;
+
+  const diffInMinutes = moment().diff(moment(lastFetch), 'minutes');
+  console.log('dffIn', diffInMinutes);
+  // How long Caching will be vaild
+  if (diffInMinutes < 10) return;
+
+  console.log(lastFetch);
+
+  dispatch(apiCallBegan({
+    url,
+    onStart: bugRequested.type,
+    onSuccess: bugReceived.type,
+    onError: bugRequestFailed.type
+  }));
+};
+
+export const addBug = bug => apiCallBegan({
+  url,
+  method: "post",
+  data: bug,
+  onSuccess: bugAdded.type,
+});
+
+export const resolveBug = id => apiCallBegan({
+  url: url + '/' + id,
+  method: "patch", // PATCH /bugs/1,
+  data: { resolved: true },
+  onSuccess: bugResolved.type 
+});
+
+export const assignBugToUser = (bugId, userId) => apiCallBegan({
+  url: url + '/' + bugId,
+  method: 'patch',
+  data: { userId },
+  onSuccess: bugAssignedToUser.type
+})
+
+// export const loadBugs = () => 
+//   apiCallBegan({
+//     url,
+//     onStart: bugRequested.type,
+//     onSuccess: bugReceived.type,
+//     onError: bugRequestFailed.type
+// });
 
 // export const getUnresolvedBugs = (state) =>
 //   state.entities.bugs.filter((bug) => !bug.resolved);
@@ -138,3 +231,6 @@ export const getBugsByUser = (userId) =>
     (state) => state.entities.bugs,
     (bugs) => bugs.filter((bug) => bug.userId === userId)
 );
+
+// One of Cohesion rules in Programming
+// Highly Related Factors should be together

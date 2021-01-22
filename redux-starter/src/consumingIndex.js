@@ -1,14 +1,36 @@
 import configureStore from './combineStore/configureStore.js';
-import * as actions from './combineStore/api.js';
+// import * as actions from './combineStore/api.js';
+import { loadBugs, addBug, resolveBug, assignBugToUser } from "./store/bugs.js";
 
 const store = configureStore();
 
-store.dispatch(
-  actions.apiCallBegan({
-    url: '/bugs',
-    onSuccess: actions.apiCallSuccess.type,
-  })
-);
+// store.dispatch(loadBugs());
+// setTimeout(() => store.dispatch(loadBugs()), 2000);
+
+// AddBug
+// store.dispatch(addBug({ description: "a" }));
+
+store.dispatch(loadBugs());
+
+// setTimeout(() => store.dispatch(resolveBug(1)), 2000);
+setTimeout(() => store.dispatch(assignBugToUser(4, 4)), 2000);
+
+
+// UI Layer - This is too defailed to write down on UI Layer - Use Encapsulation
+// store.dispatch(
+//   actions.apiCallBegan({
+//     url: '/bugs',
+//     onSuccess: 'bugs/bugsReceived',
+//   })
+// );
+
+// store.dispatch(
+//   actions.apiCallBegan({
+//     url: '/bugs',
+//     onSuccess: actions.apiCallSuccess.type,
+//     onError: actions.apiCallFailed.type
+//   })
+// );
 
 // store.dispatch({
 //   type: 'apiCallBegan', // apiRequest

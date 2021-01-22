@@ -1,0 +1,7 @@
+action: bugsRequested
+reducer: loading = true
+middleware: dispatch new action
+
+Save the data when:
+- Assigning a bug to a user
+- Resolving a bug
