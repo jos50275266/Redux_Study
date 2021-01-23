@@ -68,7 +68,7 @@ export const loadBugs = () => (dispatch, getState) => {
 
   console.log(lastFetch);
 
-  dispatch(apiCallBegan({
+  return dispatch(apiCallBegan({
     url,
     onStart: bugRequested.type,
     onSuccess: bugReceived.type,
@@ -124,8 +124,9 @@ export const getUnresolvedBugs =
   createSelector(
     (state) => state.entities.bugs,
     (state) => state.entities.projects,
-    (bugs, projects) => bugs.filter((bug) => !bug.resolved)
+    (bugs, projects) => bugs.list.filter((bug) => !bug.resolved)
 );
+
 
 export const getBugsByUser = (userId) =>
   createSelector(
